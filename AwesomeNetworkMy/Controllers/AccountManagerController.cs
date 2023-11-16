@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AwesomeNetworkMy.Models;
 using AwesomeNetworkMy.ViewModels.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -66,5 +67,18 @@ namespace AwesomeNetworkMy.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [Route("MyPage")]
+        [Authorize]
+        [HttpGet]
+        public IActionResult MyPage()
+        {
+            var user = User;
+
+            var result = _userManager.GetUserAsync(user);
+
+            return View("User", new UserViewModel(result.Result));
+        }
+
+       
     }
 }
