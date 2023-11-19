@@ -2,6 +2,11 @@ using AwesomeNetworkMy.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using AwesomeNetworkMy.Ext;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
+using AwesomeNetworkMy.Data.Repository;
 
 
 namespace AwesomeNetworkMy
@@ -29,7 +34,8 @@ namespace AwesomeNetworkMy
 
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection))
-                   .AddIdentity<User, IdentityRole>(opts =>
+                .AddUnitOfWork()
+                .AddIdentity<User, IdentityRole>(opts =>
                    {
                        opts.Password.RequiredLength = 5;
                        opts.Password.RequireNonAlphanumeric = false;

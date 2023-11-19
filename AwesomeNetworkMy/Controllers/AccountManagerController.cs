@@ -1,25 +1,34 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using AwesomeNetworkMy.Models;
+using AwesomeNetworkMy.Data.Repository;
 using AwesomeNetworkMy.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using AwesomeNetworkMy.Ext;
 using System.Diagnostics;
+using AwesomeNetworkMy.Data.UnitofWork;
+
+
 
 namespace AwesomeNetworkMy.Controllers
 {
-    public class RegisterAccountManagerController : Controller
+    public class AccountManagerController : Controller
     {
         private IMapper _mapper;
 
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-
-        public RegisterAccountManagerController(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager)
+        private IUnitOfWork _unitOfWork;
+        public AccountManagerController(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
+            _unitOfWork = unitOfWork;
         }
 
         [Route("Login")]
@@ -28,6 +37,26 @@ namespace AwesomeNetworkMy.Controllers
         {
             return View("Home/Login");
         }
+
+        [HttpGet]
+        public IActionResult Login(string returnUrl = null)
+        {
+            return View(new LoginViewModel { ReturnUrl = returnUrl });
+        }
+        
+        [Route("MyPage")]
+        [Authorize]
+        [HttpGet]
+        public IActionResult MyPage()
+        {
+            var user = User;
+
+            var result = _userManager.GetUserAsync(user);
+
+            return View("User", new UserViewModel(result.Result));
+        }
+
+
         [Route("Login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -39,16 +68,9 @@ namespace AwesomeNetworkMy.Controllers
                 var user = _mapper.Map<User>(model);
 
                 var result = await _signInManager.PasswordSignInAsync(user.Email, model.Password, model.RememberMe, false);
-                if (result.Succeeded)
+                if (!result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-                    {
-                        return Redirect(model.ReturnUrl);
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+                    return RedirectToAction("MyPage", "AccountManager");
                 }
                 else
                 {
@@ -67,18 +89,32 @@ namespace AwesomeNetworkMy.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [Route("MyPage")]
         [Authorize]
-        [HttpGet]
-        public IActionResult MyPage()
+        [Route("Update")]
+        [HttpPost]
+        public async Task<IActionResult> Update(UserEditViewModel model)
         {
-            var user = User;
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
 
-            var result = _userManager.GetUserAsync(user);
+                user.Convert(model);
 
-            return View("User", new UserViewModel(result.Result));
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("MyPage", "AccountManager");
+                }
+                else
+                {
+                    return RedirectToAction("Edit", "AccountManager");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Некорректные данные");
+                return View("Edit", model);
+            }
         }
-
-       
     }
 }
