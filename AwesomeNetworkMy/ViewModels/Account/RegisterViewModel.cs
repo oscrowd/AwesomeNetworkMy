@@ -40,7 +40,5 @@ public class RegisterViewModel
     [Display(Name = "Подтвердить пароль")]
     public string? PasswordConfirm { get; set; }
 
-    [Required]
-    [Display(Name = "Никнейм")]
-    public string? Login { get; set; }
+    public string Login => EmailReg;
 }
