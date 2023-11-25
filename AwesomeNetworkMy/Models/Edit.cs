@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AwesomeNetworkMy.Models
 {
-    public class User : IdentityUser
+    public class Edit : IdentityUser
     {
         public string? FirstName { get; set; }
 
@@ -26,9 +26,9 @@ namespace AwesomeNetworkMy.Models
             return FirstName + " " + MiddleName + " " + LastName;
         }
 
-        public User()
+        public Edit()
         {
-            Image = "https://thispersondoesnotexist.com";
+            Image = "https://via.placeholder.com/500";
             Status = "Ура! Я в соцсети!";
             About = "Информация обо мне.";
         }
