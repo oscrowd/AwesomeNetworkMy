@@ -1,0 +1,42 @@
+﻿@model AwesomeNetworkMy.ViewModels.Account.UserEditViewModel
+
+@{
+    ViewData["Title"] = "Update";
+}
+
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.17.0/jquery.validate.min.js"></script>
+<script src="https://ajax.aspnetcdn.com/ajax/jquery.validation.unobtrusive/3.2.10/jquery.validate.unobtrusive.min.js"></script>
+
+<h2>Редактирование нового пользователя</h2>
+<form method="post" asp-controller="AccountManagerController" asp-action="Update">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div>
+        <label asp-for="FirstName"></label><br />
+        <input asp-for="FirstName" />
+        <span asp-validation-for="FirstName"></span>
+    </div>
+    <div>
+        <label asp-for="LastName"></label><br />
+        <input asp-for="LastName" />
+        <span asp-validation-for="LastName"></span>
+    </div>
+    <div>
+        <label asp-for="Email"></label><br />
+        <input asp-for="Email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+    
+    <div>
+        <label asp-for="Status"></label><br />
+        <input asp-for="Status" />
+        <span asp-validation-for="Status"></span>
+    </div>
+    <div>
+        <label asp-for="About"></label><br />
+        <input asp-for="About" />
+        <span asp-validation-for="About"></span>
+    </div>
+    <div>
+        <input type="submit" asp-action="Update" value="Сохранить" />
+    </div>
+</form>

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using AwesomeNetworkMy.Ext;
 using System.Diagnostics;
 using AwesomeNetworkMy.Data.UnitofWork;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 
@@ -90,7 +91,20 @@ namespace AwesomeNetworkMy.Controllers
         }
 
         [Authorize]
-        [Route("Update")]
+        [HttpGet]
+        public async Task<IActionResult> Update()
+        {
+            var user = User;
+            var result = _userManager.GetUserAsync(user);
+            //UserEditViewModel model = new UserEditViewModel();
+            //_mapper.Map<UserEditViewModel>(user);
+            return View(new UserViewModel(result.Result));
+            //return View("User", model);
+            //return View();
+        }
+
+        [Authorize]
+        //[Route("Update")]
         [HttpPost]
         public async Task<IActionResult> Update(UserEditViewModel model)
         {
@@ -107,13 +121,13 @@ namespace AwesomeNetworkMy.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("Edit", "AccountManager");
+                    return RedirectToAction("Update", "AccountManager");
                 }
             }
             else
             {
                 ModelState.AddModelError("", "Некорректные данные");
-                return View("Edit", model);
+                return View("Update", model);
             }
         }
     }
